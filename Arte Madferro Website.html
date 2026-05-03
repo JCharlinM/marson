@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Arte Madferro - Roberto Marson</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+  
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Work Sans', sans-serif;
+      background: #F5F2ED;
+      color: #1a1a1a;
+    }
+    
+    h1, h2, h3 {
+      font-family: 'Playfair Display', serif;
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  
+  <script type="text/babel" src="design-canvas.jsx"></script>
+  <script type="text/babel" src="Navigation.jsx"></script>
+  <script type="text/babel" src="Gallery.jsx"></script>
+  <script type="text/babel" src="DetailView.jsx"></script>
+  
+  <script type="text/babel">
+    const { useState } = React;
+    const { DesignCanvas, DCSection, DCArtboard } = window;
+    
+    // Translations
+    const translations = {
+      pt: {
+        gallery: 'Galeria',
+        bio: 'Biografia',
+        contact: 'Contato',
+        hero_title: 'Arte em Madeira e Ferro',
+        hero_subtitle: 'Peças únicas que unem história, filosofia e artesanato',
+        materials: 'Materiais',
+        dimensions: 'Dimensões',
+        year: 'Ano',
+        inquire: 'Consultar sobre esta peça',
+        bio_title: 'Roberto Marson',
+        bio_intro: 'Professor de história aposentado, filósofo e amante do heavy metal',
+        bio_text: 'Roberto Marson cria peças únicas que fundem madeira recuperada de qualidade excepcional com ferro forjado. Seu estilo evoca a arte rupestre antiga, dando nova vida a materiais com história própria. Como professor de história e filósofo aposentado, Roberto traz profundidade intelectual para cada criação, enquanto sua paixão pelo heavy metal adiciona energia crua e autêntica ao seu trabalho artesanal.',
+        contact_title: 'Entre em Contato',
+        contact_text: 'Interessado em uma peça ou tem uma ideia personalizada? Entre em contato.',
+      },
+      es: {
+        gallery: 'Galería',
+        bio: 'Biografía',
+        contact: 'Contacto',
+        hero_title: 'Arte en Madera y Hierro',
+        hero_subtitle: 'Piezas únicas que unen historia, filosofía y artesanía',
+        materials: 'Materiales',
+        dimensions: 'Dimensiones',
+        year: 'Año',
+        inquire: 'Consultar sobre esta pieza',
+        bio_title: 'Roberto Marson',
+        bio_intro: 'Profesor de historia jubilado, filósofo y amante del heavy metal',
+        bio_text: 'Roberto Marson crea piezas únicas que fusionan madera recuperada de calidad excepcional con hierro forjado. Su estilo evoca el arte rupestre antiguo, dando nueva vida a materiales con historia propia. Como profesor de historia y filósofo jubilado, Roberto aporta profundidad intelectual a cada creación, mientras que su pasión por el heavy metal añade energía cruda y auténtica a su trabajo artesanal.',
+        contact_title: 'Contacto',
+        contact_text: 'Interesado en una pieza o tiene una idea personalizada? Póngase en contacto.',
+      },
+      en: {
+        gallery: 'Gallery',
+        bio: 'Biography',
+        contact: 'Contact',
+        hero_title: 'Art in Wood and Iron',
+        hero_subtitle: 'Unique pieces uniting history, philosophy and craftsmanship',
+        materials: 'Materials',
+        dimensions: 'Dimensions',
+        year: 'Year',
+        inquire: 'Inquire about this piece',
+        bio_title: 'Roberto Marson',
+        bio_intro: 'Retired history professor, philosopher and heavy metal enthusiast',
+        bio_text: 'Roberto Marson creates unique pieces that merge exceptional quality reclaimed wood with forged iron. His style evokes ancient cave art, giving new life to materials with their own history. As a retired history professor and philosopher, Roberto brings intellectual depth to each creation, while his passion for heavy metal adds raw, authentic energy to his artisanal work.',
+        contact_title: 'Get in Touch',
+        contact_text: 'Interested in a piece or have a custom idea? Get in touch.',
+      },
+    };
+    
+    // Artwork data
+    const artworksData = {
+      pt: [
+        {
+          title: 'Luminária Tronco Ancestral',
+          image: 'assets/lamp-01.jpg',
+          description: 'Peça escultural que transforma um tronco de madeira recuperada em luminária funcional. As bandas de ferro forjado abraçam a madeira envelhecida, criando um diálogo entre o orgânico e o industrial.',
+          materials: 'Madeira de demolição, ferro forjado, componentes elétricos',
+          dimensions: '25cm × 25cm × 30cm',
+        },
+        {
+          title: 'Luminária de Mesa Arc',
+          image: 'assets/lamp-desk-arc.jpg',
+          description: 'Design elegante que combina base sólida de madeira recuperada com braço arqueado de ferro forjado. O foco industrial contrasta com a textura orgânica da madeira.',
+          materials: 'Madeira recuperada, ferro forjado, componentes elétricos',
+          dimensions: '30cm × 15cm × 40cm (altura)',
+        },
+        {
+          title: 'Luminária de Piso Craftsman',
+          image: 'assets/lamp-floor-craftsman.jpg',
+          description: 'Luminária de piso minimalista com estrutura de ferro forjado e cúpula em vidro âmbar. Inspiração em design craftsman com execução contemporânea.',
+          materials: 'Ferro forjado, vidro, componentes elétricos',
+          dimensions: '35cm × 35cm × 165cm (altura)',
+        },
+        {
+          title: 'Bandeja Artesanal',
+          image: 'assets/tray-wood-iron.jpg',
+          description: 'Bandeja em madeira recuperada com asas de ferro forjado e rebites de cobre. A veta natural da madeira é protagonista desta peça funcional.',
+          materials: 'Madeira de demolição, ferro forjado, rebites de cobre',
+          dimensions: '45cm × 30cm × 5cm',
+        },
+        {
+          title: 'Porta-facas Magnético Vertical',
+          image: 'assets/knife-holder-magnetic.jpg',
+          description: 'Escultura funcional que combina madeira recuperada vertical com barras magnéticas de ferro. As fissuras naturais da madeira criam uma estética rupestre.',
+          materials: 'Madeira de demolição, ferro com ímãs de neodímio',
+          dimensions: '40cm × 12cm × 8cm',
+        },
+        {
+          title: 'Par de Suportes para Livros',
+          image: 'assets/book-stands-pair.jpg',
+          description: 'Par de suportes com base de madeira recuperada e detalhes em ferro forjado com espirais decorativas. Funcionais e escultóricos.',
+          materials: 'Madeira recuperada, ferro forjado',
+          dimensions: '15cm × 12cm × 18cm (cada)',
+        },
+        {
+          title: 'Batea Orgânica Grande',
+          image: 'assets/bowl-organic-large.jpg',
+          description: 'Batea esculpida em madeira maciça recuperada com forma orgânica. Asas de ferro forjado nas extremidades. Uma peça única que celebra a textura natural da madeira.',
+          materials: 'Madeira maciça recuperada, ferro forjado',
+          dimensions: '65cm × 35cm × 12cm',
+        },
+        {
+          title: 'Bandeja Circular com Estrutura',
+          image: 'assets/tray-circular-iron.jpg',
+          description: 'Bandeja circular em madeira clara abraçada por estrutura de ferro forjado. Design limpo e funcional com toque industrial.',
+          materials: 'Madeira recuperada, ferro forjado',
+          dimensions: 'Ø 35cm × 5cm',
+        },
+        {
+          title: 'Porta-facas Minimalista',
+          image: 'assets/knife-holder-frame.jpg',
+          description: 'Suporte magnético todo em ferro forjado com design minimalista. Pode ser usado na parede ou sobre a mesa.',
+          materials: 'Ferro forjado, ímãs de neodímio',
+          dimensions: '30cm × 20cm × 8cm',
+        },
+        {
+          title: 'Luminária Rústica Vertical',
+          image: 'assets/lamp-rustic-vertical.jpg',
+          description: 'Peça vertical que explora a textura natural da madeira recuperada. Estrutura de ferro e iluminação integrada criam uma atmosfera dramática.',
+          materials: 'Madeira de demolição, ferro forjado, componentes elétricos',
+          dimensions: '20cm × 20cm × 55cm',
+        },
+        {
+          title: 'Porta-facas Ponte',
+          image: 'assets/knife-holder-bridge.jpg',
+          description: 'Design tipo ponte com barra superior de madeira recuperada e estrutura de ferro forjado. Sistema magnético integrado.',
+          materials: 'Madeira recuperada, ferro forjado, ímãs de neodímio',
+          dimensions: '40cm × 15cm × 25cm',
+        },
+        {
+          title: 'Relógio de Lâmina de Serra',
+          image: 'assets/clock-saw-blade.jpg',
+          description: 'Relógio criado a partir de lâmina de serra circular oxidada e base de madeira recuperada. Celebração da história das ferramentas industriais.',
+          materials: 'Lâmina de serra reciclada, madeira recuperada, mecanismo de relógio',
+          dimensions: 'Ø 30cm × 8cm',
+        },
+        {
+          title: 'Par de Luminárias Bloco',
+          image: 'assets/lamps-wood-blocks-pair.jpg',
+          description: 'Par de luminárias minimalistas esculpidas em blocos de madeira maciça. Simplicidade e textura natural com lâmpadas Edison.',
+          materials: 'Madeira maciça, componentes elétricos, lâmpadas Edison',
+          dimensions: '12cm × 12cm × 15cm (cada)',
+        },
+        {
+          title: 'Porta-rolos de Cozinha',
+          image: 'assets/paper-towel-holder.jpg',
+          description: 'Porta-rolos de papel toalha em ferro forjado com detalhes em espiral. Funcional e decorativo.',
+          materials: 'Ferro forjado',
+          dimensions: '15cm × 15cm × 35cm',
+        },
+      ],
+      es: [
+        {
+          title: 'Lámpara Tronco Ancestral',
+          image: 'assets/lamp-01.jpg',
+          description: 'Pieza escultórica que transforma un tronco de madera recuperada en lámpara funcional. Las bandas de hierro forjado abrazan la madera envejecida, creando un diálogo entre lo orgánico y lo industrial.',
+          materials: 'Madera de demolición, hierro forjado, componentes eléctricos',
+          dimensions: '25cm × 25cm × 30cm',
+        },
+        {
+          title: 'Lámpara de Mesa Arc',
+          image: 'assets/lamp-desk-arc.jpg',
+          description: 'Diseño elegante que combina base sólida de madera recuperada con brazo arqueado de hierro forjado. El foco industrial contrasta con la textura orgánica de la madera.',
+          materials: 'Madera recuperada, hierro forjado, componentes eléctricos',
+          dimensions: '30cm × 15cm × 40cm (altura)',
+        },
+        {
+          title: 'Lámpara de Piso Craftsman',
+          image: 'assets/lamp-floor-craftsman.jpg',
+          description: 'Lámpara de piso minimalista con estructura de hierro forjado y cúpula en vidrio ámbar. Inspiración en diseño craftsman con ejecución contemporánea.',
+          materials: 'Hierro forjado, vidrio, componentes eléctricos',
+          dimensions: '35cm × 35cm × 165cm (altura)',
+        },
+        {
+          title: 'Bandeja Artesanal',
+          image: 'assets/tray-wood-iron.jpg',
+          description: 'Bandeja en madera recuperada con asas de hierro forjado y remaches de cobre. La veta natural de la madera es protagonista de esta pieza funcional.',
+          materials: 'Madera de demolición, hierro forjado, remaches de cobre',
+          dimensions: '45cm × 30cm × 5cm',
+        },
+        {
+          title: 'Portacuchillos Magnético Vertical',
+          image: 'assets/knife-holder-magnetic.jpg',
+          description: 'Escultura funcional que combina madera recuperada vertical con barras magnéticas de hierro. Las fisuras naturales de la madera crean una estética rupestre.',
+          materials: 'Madera de demolición, hierro con imanes de neodimio',
+          dimensions: '40cm × 12cm × 8cm',
+        },
+        {
+          title: 'Par de Soportes para Libros',
+          image: 'assets/book-stands-pair.jpg',
+          description: 'Par de soportes con base de madera recuperada y detalles en hierro forjado con espirales decorativas. Funcionales y escultóricos.',
+          materials: 'Madera recuperada, hierro forjado',
+          dimensions: '15cm × 12cm × 18cm (cada uno)',
+        },
+        {
+          title: 'Batea Orgánica Grande',
+          image: 'assets/bowl-organic-large.jpg',
+          description: 'Batea esculpida en madera maciza recuperada con forma orgánica. Asas de hierro forjado en los extremos. Una pieza única que celebra la textura natural de la madera.',
+          materials: 'Madera maciza recuperada, hierro forjado',
+          dimensions: '65cm × 35cm × 12cm',
+        },
+        {
+          title: 'Bandeja Circular con Estructura',
+          image: 'assets/tray-circular-iron.jpg',
+          description: 'Bandeja circular en madera clara abrazada por estructura de hierro forjado. Diseño limpio y funcional con toque industrial.',
+          materials: 'Madera recuperada, hierro forjado',
+          dimensions: 'Ø 35cm × 5cm',
+        },
+        {
+          title: 'Portacuchillos Minimalista',
+          image: 'assets/knife-holder-frame.jpg',
+          description: 'Soporte magnético todo en hierro forjado con diseño minimalista. Puede usarse en la pared o sobre la mesa.',
+          materials: 'Hierro forjado, imanes de neodimio',
+          dimensions: '30cm × 20cm × 8cm',
+        },
+        {
+          title: 'Lámpara Rústica Vertical',
+          image: 'assets/lamp-rustic-vertical.jpg',
+          description: 'Pieza vertical que explora la textura natural de la madera recuperada. Estructura de hierro e iluminación integrada crean una atmósfera dramática.',
+          materials: 'Madera de demolición, hierro forjado, componentes eléctricos',
+          dimensions: '20cm × 20cm × 55cm',
+        },
+        {
+          title: 'Portacuchillos Puente',
+          image: 'assets/knife-holder-bridge.jpg',
+          description: 'Diseño tipo puente con barra superior de madera recuperada y estructura de hierro forjado. Sistema magnético integrado.',
+          materials: 'Madera recuperada, hierro forjado, imanes de neodimio',
+          dimensions: '40cm × 15cm × 25cm',
+        },
+        {
+          title: 'Reloj de Hoja de Sierra',
+          image: 'assets/clock-saw-blade.jpg',
+          description: 'Reloj creado a partir de hoja de sierra circular oxidada y base de madera recuperada. Celebración de la historia de las herramientas industriales.',
+          materials: 'Hoja de sierra reciclada, madera recuperada, mecanismo de reloj',
+          dimensions: 'Ø 30cm × 8cm',
+        },
+        {
+          title: 'Par de Lámparas Bloque',
+          image: 'assets/lamps-wood-blocks-pair.jpg',
+          description: 'Par de lámparas minimalistas esculpidas en bloques de madera maciza. Simplicidad y textura natural con bombillas Edison.',
+          materials: 'Madera maciza, componentes eléctricos, bombillas Edison',
+          dimensions: '12cm × 12cm × 15cm (cada una)',
+        },
+        {
+          title: 'Portarrollos de Cocina',
+          image: 'assets/paper-towel-holder.jpg',
+          description: 'Portarrollos de papel toalla en hierro forjado con detalles en espiral. Funcional y decorativo.',
+          materials: 'Hierro forjado',
+          dimensions: '15cm × 15cm × 35cm',
+        },
+      ],
+      en: [
+        {
+          title: 'Ancestral Log Lamp',
+          image: 'assets/lamp-01.jpg',
+          description: 'Sculptural piece that transforms a reclaimed wood log into a functional lamp. Forged iron bands embrace the aged wood, creating a dialogue between organic and industrial.',
+          materials: 'Salvaged wood, forged iron, electrical components',
+          dimensions: '25cm × 25cm × 30cm',
+        },
+        {
+          title: 'Arc Desk Lamp',
+          image: 'assets/lamp-desk-arc.jpg',
+          description: 'Elegant design combining solid reclaimed wood base with arched forged iron arm. Industrial bulb contrasts with the organic wood texture.',
+          materials: 'Reclaimed wood, forged iron, electrical components',
+          dimensions: '30cm × 15cm × 40cm (height)',
+        },
+        {
+          title: 'Craftsman Floor Lamp',
+          image: 'assets/lamp-floor-craftsman.jpg',
+          description: 'Minimalist floor lamp with forged iron structure and amber glass shade. Craftsman-inspired design with contemporary execution.',
+          materials: 'Forged iron, glass, electrical components',
+          dimensions: '35cm × 35cm × 165cm (height)',
+        },
+        {
+          title: 'Artisan Tray',
+          image: 'assets/tray-wood-iron.jpg',
+          description: 'Reclaimed wood tray with forged iron handles and copper rivets. The natural wood grain is the protagonist of this functional piece.',
+          materials: 'Salvaged wood, forged iron, copper rivets',
+          dimensions: '45cm × 30cm × 5cm',
+        },
+        {
+          title: 'Vertical Magnetic Knife Holder',
+          image: 'assets/knife-holder-magnetic.jpg',
+          description: 'Functional sculpture combining vertical reclaimed wood with magnetic iron bars. Natural wood fissures create a cave-art aesthetic.',
+          materials: 'Salvaged wood, iron with neodymium magnets',
+          dimensions: '40cm × 12cm × 8cm',
+        },
+        {
+          title: 'Pair of Book Stands',
+          image: 'assets/book-stands-pair.jpg',
+          description: 'Pair of stands with reclaimed wood base and forged iron details with decorative spirals. Functional and sculptural.',
+          materials: 'Reclaimed wood, forged iron',
+          dimensions: '15cm × 12cm × 18cm (each)',
+        },
+        {
+          title: 'Large Organic Bowl',
+          image: 'assets/bowl-organic-large.jpg',
+          description: 'Bowl carved from solid reclaimed wood with organic form. Forged iron handles at the ends. A unique piece celebrating natural wood texture.',
+          materials: 'Solid reclaimed wood, forged iron',
+          dimensions: '65cm × 35cm × 12cm',
+        },
+        {
+          title: 'Circular Tray with Frame',
+          image: 'assets/tray-circular-iron.jpg',
+          description: 'Circular light wood tray embraced by forged iron structure. Clean, functional design with industrial touch.',
+          materials: 'Reclaimed wood, forged iron',
+          dimensions: 'Ø 35cm × 5cm',
+        },
+        {
+          title: 'Minimalist Knife Holder',
+          image: 'assets/knife-holder-frame.jpg',
+          description: 'All forged iron magnetic holder with minimalist design. Can be used on wall or countertop.',
+          materials: 'Forged iron, neodymium magnets',
+          dimensions: '30cm × 20cm × 8cm',
+        },
+        {
+          title: 'Rustic Vertical Lamp',
+          image: 'assets/lamp-rustic-vertical.jpg',
+          description: 'Vertical piece exploring the natural texture of reclaimed wood. Iron structure and integrated lighting create a dramatic atmosphere.',
+          materials: 'Salvaged wood, forged iron, electrical components',
+          dimensions: '20cm × 20cm × 55cm',
+        },
+        {
+          title: 'Bridge Knife Holder',
+          image: 'assets/knife-holder-bridge.jpg',
+          description: 'Bridge-style design with reclaimed wood top bar and forged iron structure. Integrated magnetic system.',
+          materials: 'Reclaimed wood, forged iron, neodymium magnets',
+          dimensions: '40cm × 15cm × 25cm',
+        },
+        {
+          title: 'Saw Blade Clock',
+          image: 'assets/clock-saw-blade.jpg',
+          description: 'Clock created from oxidized circular saw blade and reclaimed wood base. Celebration of industrial tool history.',
+          materials: 'Recycled saw blade, reclaimed wood, clock mechanism',
+          dimensions: 'Ø 30cm × 8cm',
+        },
+        {
+          title: 'Pair of Block Lamps',
+          image: 'assets/lamps-wood-blocks-pair.jpg',
+          description: 'Pair of minimalist lamps carved from solid wood blocks. Simplicity and natural texture with Edison bulbs.',
+          materials: 'Solid wood, electrical components, Edison bulbs',
+          dimensions: '12cm × 12cm × 15cm (each)',
+        },
+        {
+          title: 'Kitchen Paper Towel Holder',
+          image: 'assets/paper-towel-holder.jpg',
+          description: 'Paper towel holder in forged iron with spiral details. Functional and decorative.',
+          materials: 'Forged iron',
+          dimensions: '15cm × 15cm × 35cm',
+        },
+      ],
+    };
+    
+    // Variation 1: Classic Sophisticated
+    const ClassicSophisticated = () => {
+      const [currentPage, setCurrentPage] = useState('home');
+      const [currentLang, setCurrentLang] = useState('pt');
+      const [selectedWork, setSelectedWork] = useState(null);
+      const t = translations[currentLang];
+      const artworks = artworksData[currentLang];
+      
+      const heroStyles = {
+        container: {
+          minHeight: '100vh',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '120px 40px 80px',
+          background: '#F5F2ED',
+        },
+        content: {
+          maxWidth: '1400px',
+          width: '100%',
+          display: 'grid',
+          gridTemplateColumns: '1fr 1fr',
+          gap: '80px',
+          alignItems: 'center',
+        },
+        textSection: {
+          paddingRight: '40px',
+        },
+        title: {
+          fontSize: '72px',
+          fontWeight: '700',
+          lineHeight: '1.1',
+          marginBottom: '24px',
+          color: '#1a1a1a',
+          letterSpacing: '-1px',
+        },
+        subtitle: {
+          fontSize: '24px',
+          lineHeight: '1.5',
+          color: '#4a4a4a',
+          marginBottom: '48px',
+          fontWeight: '400',
+        },
+        cta: {
+          display: 'inline-block',
+          padding: '16px 40px',
+          background: '#1a1a1a',
+          color: 'white',
+          textDecoration: 'none',
+          fontSize: '16px',
+          fontWeight: '600',
+          borderRadius: '4px',
+          transition: 'transform 0.2s',
+          cursor: 'pointer',
+          border: 'none',
+        },
+        imageSection: {
+          position: 'relative',
+        },
+        featuredImage: {
+          width: '100%',
+          height: '600px',
+          objectFit: 'cover',
+          borderRadius: '8px',
+          boxShadow: '0 20px 60px rgba(0, 0, 0, 0.15)',
+        },
+      };
+      
+      const bioStyles = {
+        container: {
+          minHeight: '100vh',
+          padding: '120px 40px 80px',
+          background: '#2d2d2d',
+        },
+        content: {
+          maxWidth: '900px',
+          margin: '0 auto',
+        },
+        title: {
+          fontSize: '56px',
+          fontWeight: '700',
+          marginBottom: '16px',
+          textAlign: 'center',
+          color: '#ffffff',
+        },
+        intro: {
+          fontSize: '20px',
+          color: '#D4A574',
+          marginBottom: '48px',
+          textAlign: 'center',
+          fontStyle: 'italic',
+        },
+        text: {
+          fontSize: '18px',
+          lineHeight: '1.8',
+          color: '#cccccc',
+        },
+      };
+      
+      const contactStyles = {
+        container: {
+          minHeight: '100vh',
+          padding: '120px 40px 80px',
+          background: '#F5F2ED',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        },
+        content: {
+          maxWidth: '600px',
+          width: '100%',
+          textAlign: 'center',
+        },
+        title: {
+          fontSize: '48px',
+          fontWeight: '700',
+          marginBottom: '24px',
+        },
+        text: {
+          fontSize: '18px',
+          lineHeight: '1.6',
+          marginBottom: '48px',
+          color: '#4a4a4a',
+        },
+        email: {
+          fontSize: '24px',
+          color: '#1a1a1a',
+          textDecoration: 'none',
+          fontWeight: '600',
+        },
+      };
+      
+      return (
+        <div style={{ background: '#F5F2ED' }}>
+          <Navigation
+            currentPage={currentPage}
+            onNavigate={setCurrentPage}
+            currentLang={currentLang}
+            onChangeLang={setCurrentLang}
+            translations={t}
+          />
+          
+          {currentPage === 'home' && (
+            <div style={heroStyles.container}>
+              <div style={heroStyles.content}>
+                <div style={heroStyles.textSection}>
+                  <h1 style={heroStyles.title}>{t.hero_title}</h1>
+                  <p style={heroStyles.subtitle}>{t.hero_subtitle}</p>
+                  <button
+                    style={heroStyles.cta}
+                    onClick={() => setCurrentPage('gallery')}
+                    onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
+                    onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                  >
+                    {t.gallery}
+                  </button>
+                </div>
+                <div style={heroStyles.imageSection}>
+                  <img src="assets/lamp-01.jpg" alt="Featured artwork" style={heroStyles.featuredImage} />
+                </div>
+              </div>
+            </div>
+          )}
+          
+          {currentPage === 'gallery' && (
+            <div style={{ paddingTop: '80px' }}>
+              <Gallery works={artworks} onSelectWork={setSelectedWork} />
+            </div>
+          )}
+          
+          {currentPage === 'bio' && (
+            <div style={bioStyles.container}>
+              <div style={bioStyles.content}>
+                <h2 style={bioStyles.title}>{t.bio_title}</h2>
+                <p style={bioStyles.intro}>{t.bio_intro}</p>
+                <p style={bioStyles.text}>{t.bio_text}</p>
+              </div>
+            </div>
+          )}
+          
+          {currentPage === 'contact' && (
+            <div style={contactStyles.container}>
+              <div style={contactStyles.content}>
+                <h2 style={contactStyles.title}>{t.contact_title}</h2>
+                <p style={contactStyles.text}>{t.contact_text}</p>
+                <a href="mailto:info@artemadferro.com" style={contactStyles.email}>
+                  info@artemadferro.com
+                </a>
+              </div>
+            </div>
+          )}
+          
+          {selectedWork && (
+            <DetailView work={selectedWork} onClose={() => setSelectedWork(null)} translations={t} />
+          )}
+        </div>
+      );
+    };
+    
+    // Variation 2: Industrial Dark
+    const IndustrialDark = () => {
+      const [currentPage, setCurrentPage] = useState('home');
+      const [currentLang, setCurrentLang] = useState('pt');
+      const [selectedWork, setSelectedWork] = useState(null);
+      const t = translations[currentLang];
+      const artworks = artworksData[currentLang];
+      
+      const darkNavStyles = {
+        nav: {
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          background: 'rgba(26, 26, 26, 0.95)',
+          backdropFilter: 'blur(10px)',
+          zIndex: 100,
+          borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+        },
+        container: {
+          maxWidth: '1400px',
+          margin: '0 auto',
+          padding: '24px 40px',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+        },
+        logo: {
+          fontSize: '24px',
+          fontWeight: '700',
+          letterSpacing: '2px',
+          textDecoration: 'none',
+          color: '#D4A574',
+        },
+        menu: {
+          display: 'flex',
+          gap: '40px',
+          alignItems: 'center',
+          listStyle: 'none',
+          margin: 0,
+          padding: 0,
+        },
+        link: {
+          textDecoration: 'none',
+          color: '#ffffff',
+          fontSize: '16px',
+          fontWeight: '500',
+          transition: 'color 0.2s',
+          cursor: 'pointer',
+        },
+        langSelector: {
+          display: 'flex',
+          gap: '8px',
+          borderLeft: '1px solid rgba(255, 255, 255, 0.2)',
+          paddingLeft: '32px',
+        },
+        langButton: {
+          background: 'none',
+          border: 'none',
+          padding: '4px 8px',
+          fontSize: '14px',
+          fontWeight: '600',
+          cursor: 'pointer',
+          color: '#ffffff',
+          opacity: 0.5,
+          transition: 'opacity 0.2s',
+        },
+        langButtonActive: {
+          opacity: 1,
+          color: '#D4A574',
+        },
+      };
+      
+      const heroStyles = {
+        container: {
+          minHeight: '100vh',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '120px 40px 80px',
+          background: 'linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%)',
+          position: 'relative',
+          overflow: 'hidden',
+        },
+        texture: {
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.02) 2px, rgba(255,255,255,0.02) 4px)',
+          pointerEvents: 'none',
+        },
+        content: {
+          maxWidth: '1400px',
+          width: '100%',
+          display: 'grid',
+          gridTemplateColumns: '1fr 1fr',
+          gap: '80px',
+          alignItems: 'center',
+          position: 'relative',
+          zIndex: 1,
+        },
+        textSection: {
+          paddingRight: '40px',
+        },
+        title: {
+          fontSize: '82px',
+          fontWeight: '700',
+          lineHeight: '1',
+          marginBottom: '32px',
+          color: '#ffffff',
+          letterSpacing: '-2px',
+          textTransform: 'uppercase',
+        },
+        accent: {
+          color: '#D4A574',
+        },
+        subtitle: {
+          fontSize: '20px',
+          lineHeight: '1.6',
+          color: '#cccccc',
+          marginBottom: '48px',
+          fontWeight: '400',
+        },
+        cta: {
+          display: 'inline-block',
+          padding: '18px 48px',
+          background: '#D4A574',
+          color: '#1a1a1a',
+          textDecoration: 'none',
+          fontSize: '16px',
+          fontWeight: '700',
+          textTransform: 'uppercase',
+          letterSpacing: '1px',
+          transition: 'all 0.3s',
+          cursor: 'pointer',
+          border: 'none',
+          position: 'relative',
+          overflow: 'hidden',
+        },
+        imageSection: {
+          position: 'relative',
+        },
+        featuredImage: {
+          width: '100%',
+          height: '650px',
+          objectFit: 'cover',
+          border: '2px solid #D4A574',
+          boxShadow: '0 0 60px rgba(212, 165, 116, 0.3)',
+        },
+      };
+      
+      const galleryDarkStyles = {
+        container: {
+          padding: '120px 40px 80px',
+          background: '#1a1a1a',
+          minHeight: '100vh',
+        },
+      };
+      
+      return (
+        <div style={{ background: '#1a1a1a' }}>
+          <nav style={darkNavStyles.nav}>
+            <div style={darkNavStyles.container}>
+              <a href="#" style={darkNavStyles.logo} onClick={(e) => { e.preventDefault(); setCurrentPage('home'); }}>
+                MADFERRO
+              </a>
+              
+              <ul style={darkNavStyles.menu}>
+                <li>
+                  <a
+                    style={{...darkNavStyles.link, color: currentPage === 'gallery' ? '#D4A574' : '#ffffff'}}
+                    onClick={() => setCurrentPage('gallery')}
+                    onMouseEnter={(e) => e.currentTarget.style.color = '#D4A574'}
+                    onMouseLeave={(e) => e.currentTarget.style.color = currentPage === 'gallery' ? '#D4A574' : '#ffffff'}
+                  >
+                    {t.gallery}
+                  </a>
+                </li>
+                <li>
+                  <a
+                    style={{...darkNavStyles.link, color: currentPage === 'bio' ? '#D4A574' : '#ffffff'}}
+                    onClick={() => setCurrentPage('bio')}
+                    onMouseEnter={(e) => e.currentTarget.style.color = '#D4A574'}
+                    onMouseLeave={(e) => e.currentTarget.style.color = currentPage === 'bio' ? '#D4A574' : '#ffffff'}
+                  >
+                    {t.bio}
+                  </a>
+                </li>
+                <li>
+                  <a
+                    style={{...darkNavStyles.link, color: currentPage === 'contact' ? '#D4A574' : '#ffffff'}}
+                    onClick={() => setCurrentPage('contact')}
+                    onMouseEnter={(e) => e.currentTarget.style.color = '#D4A574'}
+                    onMouseLeave={(e) => e.currentTarget.style.color = currentPage === 'contact' ? '#D4A574' : '#ffffff'}
+                  >
+                    {t.contact}
+                  </a>
+                </li>
+                
+                <div style={darkNavStyles.langSelector}>
+                  {['pt', 'es', 'en'].map(lang => (
+                    <button
+                      key={lang}
+                      style={{
+                        ...darkNavStyles.langButton,
+                        ...(currentLang === lang ? darkNavStyles.langButtonActive : {})
+                      }}
+                      onClick={() => setCurrentLang(lang)}
+                    >
+                      {lang.toUpperCase()}
+                    </button>
+                  ))}
+                </div>
+              </ul>
+            </div>
+          </nav>
+          
+          {currentPage === 'home' && (
+            <div style={heroStyles.container}>
+              <div style={heroStyles.texture}></div>
+              <div style={heroStyles.content}>
+                <div style={heroStyles.textSection}>
+                  <h1 style={heroStyles.title}>
+                    MAD<span style={heroStyles.accent}>FERRO</span>
+                  </h1>
+                  <p style={heroStyles.subtitle}>{t.hero_subtitle}</p>
+                  <button
+                    style={heroStyles.cta}
+                    onClick={() => setCurrentPage('gallery')}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = '#ffffff';
+                      e.currentTarget.style.boxShadow = '0 0 30px rgba(212, 165, 116, 0.5)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = '#D4A574';
+                      e.currentTarget.style.boxShadow = 'none';
+                    }}
+                  >
+                    {t.gallery}
+                  </button>
+                </div>
+                <div style={heroStyles.imageSection}>
+                  <img src="assets/lamp-01.jpg" alt="Featured artwork" style={heroStyles.featuredImage} />
+                </div>
+              </div>
+            </div>
+          )}
+          
+          {currentPage === 'gallery' && (
+            <div style={galleryDarkStyles.container}>
+              <Gallery works={artworks} onSelectWork={setSelectedWork} />
+            </div>
+          )}
+          
+          {currentPage === 'bio' && (
+            <div style={bioStyles.container}>
+              <div style={bioStyles.content}>
+                <h2 style={bioStyles.title}>{t.bio_title}</h2>
+                <p style={bioStyles.intro}>{t.bio_intro}</p>
+                <p style={bioStyles.text}>{t.bio_text}</p>
+              </div>
+            </div>
+          )}
+          
+          {currentPage === 'contact' && (
+            <div style={contactStyles.container}>
+              <div style={contactStyles.content}>
+                <h2 style={contactStyles.title}>{t.contact_title}</h2>
+                <p style={contactStyles.text}>{t.contact_text}</p>
+                <a href="mailto:info@artemadferro.com" style={contactStyles.email}>
+                  info@artemadferro.com
+                </a>
+              </div>
+            </div>
+          )}
+          
+          {selectedWork && (
+            <DetailView work={selectedWork} onClose={() => setSelectedWork(null)} translations={t} />
+          )}
+        </div>
+      );
+    };
+    
+    // Main App with Design Canvas
+    const App = () => {
+      return (
+        <DesignCanvas>
+          <DCSection id="classic" title="Versión Clásica Sofisticada">
+            <DCArtboard id="classic-var" label="Elegante · Fondo Claro" width={1920} height={3000}>
+              <ClassicSophisticated />
+            </DCArtboard>
+          </DCSection>
+          
+          <DCSection id="industrial" title="Versión Industrial Oscura">
+            <DCArtboard id="dark-var" label="Industrial · Metal y Madera" width={1920} height={2400}>
+              <IndustrialDark />
+            </DCArtboard>
+          </DCSection>
+        </DesignCanvas>
+      );
+    };
+    
+    ReactDOM.render(<App />, document.getElementById('root'));
+  </script>
+</body>
+</html>
